@@ -1,0 +1,309 @@
+Elm.Layout = Elm.Layout || {};
+Elm.Layout.make = function (_elm) {
+   "use strict";
+   _elm.Layout = _elm.Layout || {};
+   if (_elm.Layout.values)
+   return _elm.Layout.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Layout",
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var lay = F3(function (position,
+   element,
+   dimensions) {
+      return function () {
+         var height = A2($Signal.map,
+         $Basics.snd,
+         dimensions);
+         var width = A2($Signal.map,
+         $Basics.fst,
+         dimensions);
+         return A5($Signal.map4,
+         $Graphics$Element.container,
+         width,
+         height,
+         $Signal.constant(position),
+         element);
+      }();
+   });
+   var inset = F3(function (amount,
+   dynamic,
+   dimensions) {
+      return function () {
+         var innerDimensions = A2($Signal.map,
+         function (_v0) {
+            return function () {
+               switch (_v0.ctor)
+               {case "_Tuple2":
+                  return {ctor: "_Tuple2"
+                         ,_0: _v0._0 - 2 * amount
+                         ,_1: _v0._1 - 2 * amount};}
+               _U.badCase($moduleName,
+               "on line 78, column 51 to 81");
+            }();
+         },
+         dimensions);
+         var innerElement = dynamic(innerDimensions);
+         return A3(lay,
+         $Graphics$Element.middle,
+         innerElement,
+         dimensions);
+      }();
+   });
+   var join = function (elements) {
+      return function () {
+         switch (elements.ctor)
+         {case "::":
+            return A3($Signal.map2,
+              F2(function (x,y) {
+                 return A2($List._op["::"],
+                 x,
+                 y);
+              }),
+              elements._0,
+              join(elements._1));
+            case "[]":
+            return $Signal.constant(_L.fromArray([]));}
+         _U.badCase($moduleName,
+         "between lines 55 and 57");
+      }();
+   };
+   var grid = F3(function (direction,
+   dynamics,
+   dimensions) {
+      return function () {
+         var newDimensions = A2($Signal.map,
+         function (_v7) {
+            return function () {
+               switch (_v7.ctor)
+               {case "_Tuple2":
+                  return function () {
+                       var _v11 = _U.eq(direction,
+                       $Graphics$Element.up) || _U.eq(direction,
+                       $Graphics$Element.down);
+                       switch (_v11)
+                       {case false:
+                          return {ctor: "_Tuple2"
+                                 ,_0: _v7._0 / $List.length(dynamics) | 0
+                                 ,_1: _v7._1};
+                          case true:
+                          return {ctor: "_Tuple2"
+                                 ,_0: _v7._0
+                                 ,_1: _v7._1 / $List.length(dynamics) | 0};}
+                       _U.badCase($moduleName,
+                       "between lines 63 and 65");
+                    }();}
+               _U.badCase($moduleName,
+               "between lines 63 and 65");
+            }();
+         },
+         dimensions);
+         return A2($Signal.map,
+         $Graphics$Element.flow(direction),
+         join(A2($List.map,
+         function (dynamic) {
+            return dynamic(newDimensions);
+         },
+         dynamics)));
+      }();
+   });
+   var stack = F2(function (direction,
+   statics) {
+      return function () {
+         var newElement = function (dimension) {
+            return $Signal.map($Graphics$Element.flow(direction))(join($List.map(function ($static) {
+               return $static(dimension);
+            })($List.map($Basics.snd)(statics))));
+         };
+         var fixedDimension = $Signal.map($List.sum)(join($List.map($Basics.fst)(statics)));
+         return {ctor: "_Tuple2"
+                ,_0: fixedDimension
+                ,_1: newElement};
+      }();
+   });
+   _op["~#"] = F3(function (dynamic,
+   f,
+   dimensions) {
+      return A2(f,
+      dynamic(dimensions),
+      dimensions);
+   });
+   _op["##"] = F2(function ($static,
+   f) {
+      return {ctor: "_Tuple2"
+             ,_0: $Basics.fst($static)
+             ,_1: function (dimension) {
+                return A2($Signal.map,
+                f,
+                A2($Basics.snd,
+                $static,
+                dimension));
+             }};
+   });
+   _op["#"] = F3(function (dynamic,
+   f,
+   dimensions) {
+      return A2($Signal.map,
+      f,
+      dynamic(dimensions));
+   });
+   var border = F3(function (x,
+   c,
+   e) {
+      return A2(_op["#"],
+      inset(x)(e),
+      $Graphics$Element.color(c));
+   });
+   var bar = function (h) {
+      return {ctor: "_Tuple2"
+             ,_0: h
+             ,_1: A2($Signal.map2,
+             $Basics.flip($Graphics$Element.spacer),
+             h)};
+   };
+   var pole = function (w) {
+      return {ctor: "_Tuple2"
+             ,_0: w
+             ,_1: A2($Signal.map2,
+             $Graphics$Element.spacer,
+             w)};
+   };
+   var space = $Signal.map($Basics.uncurry($Graphics$Element.spacer));
+   var ofHeight = F2(function (dynamic,
+   h) {
+      return {ctor: "_Tuple2"
+             ,_0: h
+             ,_1: function (w) {
+                return dynamic(A3($Signal.map2,
+                F2(function (v0,v1) {
+                   return {ctor: "_Tuple2"
+                          ,_0: v0
+                          ,_1: v1};
+                }),
+                w,
+                h));
+             }};
+   });
+   var ofWidth = F2(function (dynamic,
+   w) {
+      return {ctor: "_Tuple2"
+             ,_0: w
+             ,_1: function (h) {
+                return dynamic(A3($Signal.map2,
+                F2(function (v0,v1) {
+                   return {ctor: "_Tuple2"
+                          ,_0: v0
+                          ,_1: v1};
+                }),
+                w,
+                h));
+             }};
+   });
+   var fit = F5(function (combiner,
+   f,
+   $static,
+   dynamic,
+   dimensions) {
+      return function () {
+         var dimensions$ = A3($Signal.map2,
+         f,
+         dimensions,
+         $Basics.fst($static));
+         return A3($Signal.map2,
+         combiner,
+         A2($Basics.snd,
+         $static,
+         A2($Signal.map,
+         $Basics.fst,
+         dimensions$)),
+         dynamic(A2($Signal.map,
+         $Basics.snd,
+         dimensions$)));
+      }();
+   });
+   var over = A2(fit,
+   $Graphics$Element.above,
+   F2(function (_v12,h) {
+      return function () {
+         switch (_v12.ctor)
+         {case "_Tuple2":
+            return {ctor: "_Tuple2"
+                   ,_0: _v12._0
+                   ,_1: {ctor: "_Tuple2"
+                        ,_0: _v12._0
+                        ,_1: _v12._1 - h}};}
+         _U.badCase($moduleName,
+         "on line 19, column 33 to 46");
+      }();
+   }));
+   var under = A2(fit,
+   $Graphics$Element.below,
+   F2(function (_v16,h) {
+      return function () {
+         switch (_v16.ctor)
+         {case "_Tuple2":
+            return {ctor: "_Tuple2"
+                   ,_0: _v16._0
+                   ,_1: {ctor: "_Tuple2"
+                        ,_0: _v16._0
+                        ,_1: _v16._1 - h}};}
+         _U.badCase($moduleName,
+         "on line 22, column 34 to 47");
+      }();
+   }));
+   var leftOf = A2(fit,
+   $Graphics$Element.beside,
+   F2(function (_v20,w) {
+      return function () {
+         switch (_v20.ctor)
+         {case "_Tuple2":
+            return {ctor: "_Tuple2"
+                   ,_0: _v20._1
+                   ,_1: {ctor: "_Tuple2"
+                        ,_0: _v20._0 - w
+                        ,_1: _v20._1}};}
+         _U.badCase($moduleName,
+         "on line 25, column 36 to 49");
+      }();
+   }));
+   var rightOf = A2(fit,
+   $Basics.flip($Graphics$Element.beside),
+   F2(function (_v24,w) {
+      return function () {
+         switch (_v24.ctor)
+         {case "_Tuple2":
+            return {ctor: "_Tuple2"
+                   ,_0: _v24._1
+                   ,_1: {ctor: "_Tuple2"
+                        ,_0: _v24._0 - w
+                        ,_1: _v24._1}};}
+         _U.badCase($moduleName,
+         "on line 28, column 44 to 57");
+      }();
+   }));
+   _elm.Layout.values = {_op: _op
+                        ,fit: fit
+                        ,over: over
+                        ,under: under
+                        ,leftOf: leftOf
+                        ,rightOf: rightOf
+                        ,ofWidth: ofWidth
+                        ,ofHeight: ofHeight
+                        ,space: space
+                        ,pole: pole
+                        ,bar: bar
+                        ,join: join
+                        ,grid: grid
+                        ,stack: stack
+                        ,inset: inset
+                        ,lay: lay
+                        ,border: border};
+   return _elm.Layout.values;
+};

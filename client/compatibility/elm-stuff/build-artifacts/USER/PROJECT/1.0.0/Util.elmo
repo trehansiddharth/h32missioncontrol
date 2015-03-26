@@ -1,0 +1,47 @@
+Elm.Util = Elm.Util || {};
+Elm.Util.make = function (_elm) {
+   "use strict";
+   _elm.Util = _elm.Util || {};
+   if (_elm.Util.values)
+   return _elm.Util.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Util",
+   $Basics = Elm.Basics.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var after = F2(function (t,
+   reset) {
+      return function () {
+         var combine = F2(function (update,
+         since) {
+            return function () {
+               switch (update.ctor)
+               {case "Just":
+                  return update._0 + since;
+                  case "Nothing": return 0;}
+               _U.badCase($moduleName,
+               "between lines 13 and 16");
+            }();
+         });
+         var zero = A2($Signal.map,
+         $Basics.always($Maybe.Nothing),
+         reset);
+         var fpsRate = $Time.second / t;
+         var time = A2($Signal.map,
+         $Maybe.Just,
+         $Time.fps(fpsRate));
+         return A3($Signal.foldp,
+         combine,
+         0,
+         A2($Signal.merge,time,zero));
+      }();
+   });
+   _elm.Util.values = {_op: _op
+                      ,after: after};
+   return _elm.Util.values;
+};

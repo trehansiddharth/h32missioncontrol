@@ -1,0 +1,149 @@
+Elm.Search = Elm.Search || {};
+Elm.Search.Result = Elm.Search.Result || {};
+Elm.Search.Result.make = function (_elm) {
+   "use strict";
+   _elm.Search = _elm.Search || {};
+   _elm.Search.Result = _elm.Search.Result || {};
+   if (_elm.Search.Result.values)
+   return _elm.Search.Result.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Search.Result",
+   $Basics = Elm.Basics.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Graphics$Input = Elm.Graphics.Input.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Model = Elm.Model.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Text = Elm.Text.make(_elm),
+   $Theme = Elm.Theme.make(_elm);
+   var loadingResults = function (_v0) {
+      return function () {
+         switch (_v0.ctor)
+         {case "_Tuple2":
+            return A3($Graphics$Element.container,
+              _v0._0,
+              _v0._1,
+              $Graphics$Element.middle)($Text.plainText("Loading results..."));}
+         _U.badCase($moduleName,
+         "on line 53, column 25 to 84");
+      }();
+   };
+   var infoCell = F2(function (info,
+   _v4) {
+      return function () {
+         switch (_v4.ctor)
+         {case "_Tuple2":
+            return A3($Graphics$Element.container,
+              _v4._0,
+              _v4._1,
+              $Graphics$Element.middle)($Text.plainText(info));}
+         _U.badCase($moduleName,
+         "on line 50, column 24 to 67");
+      }();
+   });
+   var songIcon = function (_v8) {
+      return function () {
+         switch (_v8.ctor)
+         {case "_Tuple2":
+            return A3($Graphics$Element.image,
+              _v8._0,
+              _v8._1,
+              "http://cdn.pitchfork.com/news/53333/402b3c88.jpg");}
+         _U.badCase($moduleName,
+         "on line 47, column 19 to 79");
+      }();
+   };
+   var selectedSong = $Signal.channel($Maybe.Nothing);
+   var searchResult = F2(function (width,
+   songInfo) {
+      return function () {
+         var queueButton = $Graphics$Element.color($Theme.buttonColor)(A2($Graphics$Input.button,
+         A2($Signal.send,
+         selectedSong,
+         $Maybe.Just(songInfo.file)),
+         "Queue"));
+         var songIconInsetAmount = 0;
+         var insetAmount = 6;
+         var queueButtonContainerWidth = 120 - insetAmount * 2;
+         var height = 60;
+         var songIconWidth = height - insetAmount * 2 - songIconInsetAmount * 2;
+         var songIconHeight = height - insetAmount * 2 - songIconInsetAmount * 2;
+         var songIconContainerWidth = height - insetAmount * 2;
+         var songIconElement = A4($Graphics$Element.container,
+         songIconContainerWidth,
+         songIconContainerWidth,
+         $Graphics$Element.middle,
+         songIcon({ctor: "_Tuple2"
+                  ,_0: songIconWidth
+                  ,_1: songIconHeight}));
+         var innerWidth = width - songIconContainerWidth - queueButtonContainerWidth - insetAmount * 2;
+         var songIconContainerHeight = height - insetAmount * 2;
+         var queueButtonContainerHeight = height - insetAmount * 2;
+         var queueButtonElement = A4($Graphics$Element.container,
+         queueButtonContainerWidth,
+         queueButtonContainerHeight,
+         $Graphics$Element.middle,
+         queueButton);
+         var innerHeight = height - insetAmount * 2;
+         var row = $Graphics$Element.color($Theme.rowBackgroundColor)(A2($Graphics$Element.flow,
+         $Graphics$Element.right,
+         _L.fromArray([songIconElement
+                      ,A2(infoCell,
+                      songInfo.title,
+                      {ctor: "_Tuple2"
+                      ,_0: innerWidth / 3 | 0
+                      ,_1: innerHeight})
+                      ,A2(infoCell,
+                      songInfo.album,
+                      {ctor: "_Tuple2"
+                      ,_0: innerWidth / 3 | 0
+                      ,_1: innerHeight})
+                      ,A2(infoCell,
+                      songInfo.artist,
+                      {ctor: "_Tuple2"
+                      ,_0: innerWidth / 3 | 0
+                      ,_1: innerHeight})
+                      ,queueButtonElement])));
+         return A4($Graphics$Element.container,
+         width,
+         height,
+         $Graphics$Element.middle,
+         row);
+      }();
+   });
+   var searchResults = F2(function (_v12,
+   resultState) {
+      return function () {
+         switch (_v12.ctor)
+         {case "_Tuple2":
+            return function () {
+                 switch (resultState.ctor)
+                 {case "LoadingResults":
+                    return loadingResults({ctor: "_Tuple2"
+                                          ,_0: _v12._0
+                                          ,_1: _v12._1});
+                    case "NoSearch":
+                    return $Graphics$Element.empty;
+                    case "SearchResults":
+                    return $Graphics$Element.flow($Graphics$Element.down)($List.map(searchResult(_v12._0))(resultState._0));}
+                 _U.badCase($moduleName,
+                 "between lines 16 and 19");
+              }();}
+         _U.badCase($moduleName,
+         "between lines 16 and 19");
+      }();
+   });
+   _elm.Search.Result.values = {_op: _op
+                               ,selectedSong: selectedSong
+                               ,searchResults: searchResults
+                               ,searchResult: searchResult
+                               ,songIcon: songIcon
+                               ,infoCell: infoCell
+                               ,loadingResults: loadingResults};
+   return _elm.Search.Result.values;
+};

@@ -1,0 +1,74 @@
+Elm.Search = Elm.Search || {};
+Elm.Search.Box = Elm.Search.Box || {};
+Elm.Search.Box.make = function (_elm) {
+   "use strict";
+   _elm.Search = _elm.Search || {};
+   _elm.Search.Box = _elm.Search.Box || {};
+   if (_elm.Search.Box.values)
+   return _elm.Search.Box.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Search.Box",
+   $Basics = Elm.Basics.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Graphics$Input = Elm.Graphics.Input.make(_elm),
+   $Graphics$Input$Field = Elm.Graphics.Input.Field.make(_elm),
+   $Layout = Elm.Layout.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Theme = Elm.Theme.make(_elm);
+   var sendQuery = $Signal.channel(false);
+   var searchBoxButton = function (dimensions) {
+      return function () {
+         var h = A2($Signal.map,
+         $Basics.snd,
+         dimensions);
+         var w = A2($Signal.map,
+         $Basics.fst,
+         dimensions);
+         var buttonElement = $Graphics$Element.color($Theme.buttonColor)(A2($Graphics$Input.button,
+         A2($Signal.send,sendQuery,true),
+         "Search"));
+         return A2($Signal.map2,
+         $Graphics$Element.height,
+         h)(A2($Signal.map2,
+         $Graphics$Element.width,
+         w)($Signal.constant(buttonElement)));
+      }();
+   };
+   var searchQuery = $Signal.channel($Graphics$Input$Field.noContent);
+   var searchBoxField = function (dimensions) {
+      return function () {
+         var h = A2($Signal.map,
+         $Basics.snd,
+         dimensions);
+         var w = A2($Signal.map,
+         $Basics.fst,
+         dimensions);
+         var fieldElement = A2($Signal.map,
+         A3($Graphics$Input$Field.field,
+         $Graphics$Input$Field.defaultStyle,
+         $Signal.send(searchQuery),
+         "Search for music..."),
+         $Signal.subscribe(searchQuery));
+         return A2($Signal.map2,
+         $Graphics$Element.height,
+         h)(A2($Signal.map2,
+         $Graphics$Element.width,
+         w)(fieldElement));
+      }();
+   };
+   var searchBox = $Layout.inset(10)(A2($Layout.grid,
+   $Graphics$Element.down,
+   _L.fromArray([searchBoxField
+                ,searchBoxButton])));
+   _elm.Search.Box.values = {_op: _op
+                            ,searchQuery: searchQuery
+                            ,sendQuery: sendQuery
+                            ,searchBoxField: searchBoxField
+                            ,searchBoxButton: searchBoxButton
+                            ,searchBox: searchBox};
+   return _elm.Search.Box.values;
+};

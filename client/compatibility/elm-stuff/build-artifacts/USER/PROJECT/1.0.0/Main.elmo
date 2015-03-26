@@ -1,0 +1,452 @@
+Elm.Main = Elm.Main || {};
+Elm.Main.make = function (_elm) {
+   "use strict";
+   _elm.Main = _elm.Main || {};
+   if (_elm.Main.values)
+   return _elm.Main.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Main",
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Graphics$Input = Elm.Graphics.Input.make(_elm),
+   $Layout = Elm.Layout.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Model = Elm.Model.make(_elm),
+   $Scrollable = Elm.Scrollable.make(_elm),
+   $Search$Box = Elm.Search.Box.make(_elm),
+   $Search$Result = Elm.Search.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Text = Elm.Text.make(_elm),
+   $Theme = Elm.Theme.make(_elm),
+   $Window = Elm.Window.make(_elm);
+   var songCommand = $Signal.channel($Maybe.Nothing);
+   var playButton = $Graphics$Element.color($Theme.buttonColor)(A2($Graphics$Input.button,
+   A2($Signal.send,
+   songCommand,
+   $Maybe.Just($Model.Play)),
+   "Play"));
+   var pauseButton = $Graphics$Element.color($Theme.buttonColor)(A2($Graphics$Input.button,
+   A2($Signal.send,
+   songCommand,
+   $Maybe.Just($Model.Pause)),
+   "Pause"));
+   var nextButton = $Graphics$Element.color($Theme.buttonColor)(A2($Graphics$Input.button,
+   A2($Signal.send,
+   songCommand,
+   $Maybe.Just($Model.Next)),
+   "Next"));
+   var nextSongOut = _P.portOut("nextSongOut",
+   _P.outgoingSignal(function (v) {
+      return v.ctor === "Nothing" ? null : v._0;
+   }),
+   $Signal.subscribe($Search$Result.selectedSong));
+   var songCommandOut = _P.portOut("songCommandOut",
+   _P.outgoingSignal(function (v) {
+      return v.ctor === "Nothing" ? null : v._0;
+   }),
+   A2($Signal._op["<~"],
+   function (state) {
+      return function () {
+         switch (state.ctor)
+         {case "Just":
+            switch (state._0.ctor)
+              {case "Next":
+                 return $Maybe.Just("next");
+                 case "Pause":
+                 return $Maybe.Just("pause");
+                 case "Play":
+                 return $Maybe.Just("play");}
+              break;
+            case "Nothing":
+            return $Maybe.Nothing;}
+         _U.badCase($moduleName,
+         "between lines 30 and 34");
+      }();
+   },
+   $Signal.subscribe(songCommand)));
+   var searchQueryOut = _P.portOut("searchQueryOut",
+   _P.outgoingSignal(function (v) {
+      return v.ctor === "Nothing" ? null : v._0;
+   }),
+   A2($Signal._op["<~"],
+   function (content) {
+      return function () {
+         var _v2 = content.string;
+         switch (_v2)
+         {case "":
+            return $Maybe.Nothing;}
+         return $Maybe.Just(_v2);
+      }();
+   },
+   A2($Signal.sampleOn,
+   $Signal.subscribe($Search$Box.sendQuery),
+   $Signal.subscribe($Search$Box.searchQuery))));
+   var musicStatus = _P.portIn("musicStatus",
+   _P.incomingSignal(function (v) {
+      return typeof v === "object" && "volume" in v && "elapsed" in v && "song" in v && "state" in v ? {_: {}
+                                                                                                       ,volume: typeof v.volume === "number" ? v.volume : _U.badPort("a number",
+                                                                                                       v.volume)
+                                                                                                       ,elapsed: v.elapsed === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v.elapsed === "number" ? v.elapsed : _U.badPort("a number",
+                                                                                                       v.elapsed))
+                                                                                                       ,song: v.song === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v.song === "object" && "file" in v.song && "title" in v.song && "album" in v.song && "artist" in v.song && "time" in v.song ? {_: {}
+                                                                                                                                                                                                                                                                                                                              ,file: typeof v.song.file === "string" || typeof v.song.file === "object" && v.song.file instanceof String ? v.song.file : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                              v.song.file)
+                                                                                                                                                                                                                                                                                                                              ,title: typeof v.song.title === "string" || typeof v.song.title === "object" && v.song.title instanceof String ? v.song.title : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                              v.song.title)
+                                                                                                                                                                                                                                                                                                                              ,album: typeof v.song.album === "string" || typeof v.song.album === "object" && v.song.album instanceof String ? v.song.album : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                              v.song.album)
+                                                                                                                                                                                                                                                                                                                              ,artist: typeof v.song.artist === "string" || typeof v.song.artist === "object" && v.song.artist instanceof String ? v.song.artist : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                                              v.song.artist)
+                                                                                                                                                                                                                                                                                                                              ,time: typeof v.song.time === "number" ? v.song.time : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                                              v.song.time)} : _U.badPort("an object with fields \'file\', \'title\', \'album\', \'artist\', \'time\'",
+                                                                                                       v.song))
+                                                                                                       ,state: typeof v.state === "string" || typeof v.state === "object" && v.state instanceof String ? v.state : _U.badPort("a string",
+                                                                                                       v.state)} : _U.badPort("an object with fields \'volume\', \'elapsed\', \'song\', \'state\'",
+      v);
+   }));
+   var stateBox = function () {
+      var songInfo = function (info) {
+         return function () {
+            switch (info.ctor)
+            {case "Just":
+               return $Text.centered($Text.color($Color.white)($Text.fromString(A2($Basics._op["++"],
+                 info._0.title,
+                 A2($Basics._op["++"],
+                 " — ",
+                 info._0.artist)))));
+               case "Nothing":
+               return $Graphics$Element.empty;}
+            _U.badCase($moduleName,
+            "between lines 80 and 83");
+         }();
+      };
+      var dynamicStatus = A2($Layout._op["#"],
+      A2($Layout.lay,
+      $Graphics$Element.middle,
+      A2($Signal._op["<~"],
+      function ($) {
+         return songInfo(function (_) {
+            return _.song;
+         }($));
+      },
+      musicStatus)),
+      $Graphics$Element.color($Theme.playerBackgroundColor));
+      var currentSong = A2($Signal._op["<~"],
+      function (_) {
+         return _.song;
+      },
+      musicStatus);
+      var appropriateButton = A2($Signal._op["<~"],
+      function (status) {
+         return function () {
+            var _v5 = status.state;
+            switch (_v5)
+            {case "pause":
+               return playButton;
+               case "play": return pauseButton;
+               case "stop": return playButton;}
+            _U.badCase($moduleName,
+            "between lines 74 and 77");
+         }();
+      },
+      musicStatus);
+      var buttons = A2($Signal._op["<~"],
+      $Graphics$Element.flow($Graphics$Element.right),
+      $Layout.join(_L.fromArray([appropriateButton
+                                ,$Signal.constant(nextButton)])));
+      var dynamicButtons = A2($Layout._op["#"],
+      A2($Layout.lay,
+      $Graphics$Element.middle,
+      buttons),
+      $Graphics$Element.color($Theme.playerBackgroundColor));
+      return A2($Layout.grid,
+      $Graphics$Element.down,
+      _L.fromArray([dynamicStatus
+                   ,dynamicButtons]));
+   }();
+   var browsePanel = function () {
+      var stateElement = stateBox($Signal.constant({ctor: "_Tuple2"
+                                                   ,_0: 230
+                                                   ,_1: 80}));
+      var dynamicStateElement = A2($Layout._op["#"],
+      A2($Layout.lay,
+      $Graphics$Element.midBottom,
+      stateElement),
+      $Graphics$Element.color($Theme.panelBackgroundColor));
+      var searchElement = $Search$Box.searchBox($Signal.constant({ctor: "_Tuple2"
+                                                                 ,_0: 230
+                                                                 ,_1: 100}));
+      var dynamicSearchElement = A2($Layout._op["#"],
+      A2($Layout.lay,
+      $Graphics$Element.midTop,
+      searchElement),
+      $Graphics$Element.color($Theme.panelBackgroundColor));
+      var dynamicElement = function (dimensions) {
+         return function () {
+            var dimensionsBottom = A2($Signal._op["<~"],
+            function (_v6) {
+               return function () {
+                  switch (_v6.ctor)
+                  {case "_Tuple2":
+                     return {ctor: "_Tuple2"
+                            ,_0: _v6._0
+                            ,_1: _v6._1 - 100};}
+                  _U.badCase($moduleName,
+                  "on line 55, column 49 to 59");
+               }();
+            },
+            dimensions);
+            var dimensionsTop = A2($Signal._op["<~"],
+            function (_v10) {
+               return function () {
+                  switch (_v10.ctor)
+                  {case "_Tuple2":
+                     return {ctor: "_Tuple2"
+                            ,_0: _v10._0
+                            ,_1: 100};}
+                  _U.badCase($moduleName,
+                  "on line 54, column 46 to 52");
+               }();
+            },
+            dimensions);
+            return A2($Signal._op["<~"],
+            $Graphics$Element.flow($Graphics$Element.down),
+            $Layout.join(_L.fromArray([dynamicSearchElement(dimensionsTop)
+                                      ,dynamicStateElement(dimensionsBottom)])));
+         }();
+      };
+      var borderedDynamicElement = A2($Layout.border,
+      1,
+      $Theme.panelBorderColor)(dynamicElement);
+      var staticElement = A2($Layout.ofWidth,
+      dynamicElement,
+      $Signal.constant(230));
+      return staticElement;
+   }();
+   var timeBar = function (dimensions) {
+      return function () {
+         var totalTime = A2($Signal._op["<~"],
+         function (status) {
+            return function () {
+               var _v14 = status.song;
+               switch (_v14.ctor)
+               {case "Just":
+                  return _v14._0.time;
+                  case "Nothing": return 1;}
+               _U.badCase($moduleName,
+               "between lines 97 and 99");
+            }();
+         },
+         musicStatus);
+         var elapsedTime = A2($Signal._op["<~"],
+         function (status) {
+            return function () {
+               var _v16 = status.elapsed;
+               switch (_v16.ctor)
+               {case "Just": return _v16._0;
+                  case "Nothing": return 0;}
+               _U.badCase($moduleName,
+               "between lines 94 and 96");
+            }();
+         },
+         musicStatus);
+         var remainingTime = A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         F2(function (total,elapsed) {
+            return total - elapsed;
+         }),
+         totalTime),
+         elapsedTime);
+         var height = A2($Signal._op["<~"],
+         $Basics.snd,
+         dimensions);
+         var width = A2($Signal._op["<~"],
+         $Basics.fst,
+         dimensions);
+         var elapsedWidth = A2($Signal._op["~"],
+         A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         F3(function (elapsed,total,w) {
+            return elapsed * w / total | 0;
+         }),
+         elapsedTime),
+         totalTime),
+         width);
+         var elapsedBar = A2($Signal._op["<~"],
+         $Graphics$Element.color($Theme.elapsedColor),
+         A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         $Graphics$Element.spacer,
+         elapsedWidth),
+         height));
+         var remainingWidth = A2($Signal._op["~"],
+         A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         F3(function (remaining,
+         total,
+         w) {
+            return remaining * w / total | 0;
+         }),
+         remainingTime),
+         totalTime),
+         width);
+         var remainingBar = A2($Signal._op["<~"],
+         $Graphics$Element.color($Theme.remainingColor),
+         A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         $Graphics$Element.spacer,
+         remainingWidth),
+         height));
+         return A2($Signal._op["<~"],
+         $Graphics$Element.flow($Graphics$Element.right),
+         $Layout.join(_L.fromArray([elapsedBar
+                                   ,remainingBar])));
+      }();
+   };
+   var player = A2($Layout.ofHeight,
+   A2($Layout._op["#"],
+   function (dimensions) {
+      return function () {
+         var height = A2($Signal._op["<~"],
+         $Basics.snd,
+         dimensions);
+         var timeBarHeight = A2($Signal._op["<~"],
+         $Basics.always(7),
+         height);
+         var width = A2($Signal._op["<~"],
+         $Basics.fst,
+         dimensions);
+         var timeBarWidth = A2($Signal._op["<~"],
+         function (w) {
+            return w - 20;
+         },
+         width);
+         var timeBarDimensions = A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         F2(function (v0,v1) {
+            return {ctor: "_Tuple2"
+                   ,_0: v0
+                   ,_1: v1};
+         }),
+         timeBarWidth),
+         timeBarHeight);
+         return A3($Layout.lay,
+         $Graphics$Element.middle,
+         timeBar(timeBarDimensions),
+         dimensions);
+      }();
+   },
+   $Graphics$Element.color($Theme.playerBackgroundColor)),
+   $Signal.constant(80));
+   var searchQueryResult = _P.portIn("searchQueryResult",
+   _P.incomingSignal(function (v) {
+      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "object" && "command" in v && "arguments" in v && "waiting" in v && "result" in v ? {_: {}
+                                                                                                                                                                                    ,command: typeof v.command === "string" || typeof v.command === "object" && v.command instanceof String ? v.command : _U.badPort("a string",
+                                                                                                                                                                                    v.command)
+                                                                                                                                                                                    ,arguments: typeof v.arguments === "object" && v.arguments instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.arguments.map(function (v) {
+                                                                                                                                                                                       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
+                                                                                                                                                                                       v);
+                                                                                                                                                                                    })) : _U.badPort("an array",
+                                                                                                                                                                                    v.arguments)
+                                                                                                                                                                                    ,waiting: typeof v.waiting === "boolean" ? v.waiting : _U.badPort("a boolean (true or false)",
+                                                                                                                                                                                    v.waiting)
+                                                                                                                                                                                    ,result: typeof v.result === "object" && v.result instanceof Array ? Elm.Native.List.make(_elm).fromArray(v.result.map(function (v) {
+                                                                                                                                                                                       return typeof v === "object" && "file" in v && "title" in v && "album" in v && "artist" in v && "time" in v ? {_: {}
+                                                                                                                                                                                                                                                                                                     ,file: typeof v.file === "string" || typeof v.file === "object" && v.file instanceof String ? v.file : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                     v.file)
+                                                                                                                                                                                                                                                                                                     ,title: typeof v.title === "string" || typeof v.title === "object" && v.title instanceof String ? v.title : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                     v.title)
+                                                                                                                                                                                                                                                                                                     ,album: typeof v.album === "string" || typeof v.album === "object" && v.album instanceof String ? v.album : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                     v.album)
+                                                                                                                                                                                                                                                                                                     ,artist: typeof v.artist === "string" || typeof v.artist === "object" && v.artist instanceof String ? v.artist : _U.badPort("a string",
+                                                                                                                                                                                                                                                                                                     v.artist)
+                                                                                                                                                                                                                                                                                                     ,time: typeof v.time === "number" ? v.time : _U.badPort("a number",
+                                                                                                                                                                                                                                                                                                     v.time)} : _U.badPort("an object with fields \'file\', \'title\', \'album\', \'artist\', \'time\'",
+                                                                                                                                                                                       v);
+                                                                                                                                                                                    })) : _U.badPort("an array",
+                                                                                                                                                                                    v.result)} : _U.badPort("an object with fields \'command\', \'arguments\', \'waiting\', \'result\'",
+      v));
+   }));
+   var view = A2($Layout.border,
+   1,
+   $Theme.viewBorderColor)(A2($Layout._op["#"],
+   $Scrollable.scrollable(function (dimensions) {
+      return function () {
+         var resultState = A2($Signal._op["<~"],
+         function (queries) {
+            return function () {
+               switch (queries.ctor)
+               {case "Just":
+                  return function () {
+                       var _v20 = queries._0.waiting || !_U.eq(queries._0.command,
+                       "search");
+                       switch (_v20)
+                       {case false:
+                          return $Model.SearchResults(queries._0.result);
+                          case true:
+                          return $Model.LoadingResults;}
+                       _U.badCase($moduleName,
+                       "between lines 118 and 120");
+                    }();
+                  case "Nothing":
+                  return $Model.NoSearch;}
+               _U.badCase($moduleName,
+               "between lines 116 and 120");
+            }();
+         },
+         searchQueryResult);
+         var bufferWidth = 1;
+         var scrollbarWidth = 15;
+         var width = A2($Signal._op["<~"],
+         function (_v21) {
+            return function () {
+               switch (_v21.ctor)
+               {case "_Tuple2":
+                  return _v21._0 - scrollbarWidth - bufferWidth;}
+               _U.badCase($moduleName,
+               "on line 114, column 29 to 61");
+            }();
+         },
+         dimensions);
+         var dimensions$ = A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         F2(function (v0,v1) {
+            return {ctor: "_Tuple2"
+                   ,_0: v0
+                   ,_1: v1};
+         }),
+         width),
+         A2($Signal._op["<~"],
+         $Basics.snd,
+         dimensions));
+         return A2($Signal._op["~"],
+         A2($Signal._op["<~"],
+         $Search$Result.searchResults,
+         dimensions$),
+         resultState);
+      }();
+   }),
+   $Graphics$Element.color($Theme.viewBackgroundColor)));
+   var layout = A2($Layout.leftOf,
+   browsePanel,
+   A2($Layout.under,player,view));
+   var main = layout($Window.dimensions);
+   _elm.Main.values = {_op: _op
+                      ,main: main
+                      ,layout: layout
+                      ,browsePanel: browsePanel
+                      ,player: player
+                      ,stateBox: stateBox
+                      ,timeBar: timeBar
+                      ,view: view
+                      ,songCommand: songCommand
+                      ,playButton: playButton
+                      ,pauseButton: pauseButton
+                      ,nextButton: nextButton};
+   return _elm.Main.values;
+};

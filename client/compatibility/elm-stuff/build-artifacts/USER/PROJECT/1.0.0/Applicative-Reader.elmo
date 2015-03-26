@@ -1,0 +1,32 @@
+Elm.Applicative = Elm.Applicative || {};
+Elm.Applicative.Reader = Elm.Applicative.Reader || {};
+Elm.Applicative.Reader.make = function (_elm) {
+   "use strict";
+   _elm.Applicative = _elm.Applicative || {};
+   _elm.Applicative.Reader = _elm.Applicative.Reader || {};
+   if (_elm.Applicative.Reader.values)
+   return _elm.Applicative.Reader.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Applicative.Reader",
+   $Basics = Elm.Basics.make(_elm);
+   var env = $Basics.identity;
+   _op["<*>"] = F3(function (f,
+   x,
+   r) {
+      return A2(f,r,x(r));
+   });
+   var pure = $Basics.always;
+   _op["<$>"] = F2(function (f,x) {
+      return A2(_op["<*>"],
+      pure(f),
+      x);
+   });
+   _elm.Applicative.Reader.values = {_op: _op
+                                    ,pure: pure
+                                    ,env: env};
+   return _elm.Applicative.Reader.values;
+};

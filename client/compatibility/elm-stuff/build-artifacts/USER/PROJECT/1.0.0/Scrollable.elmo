@@ -1,0 +1,97 @@
+Elm.Scrollable = Elm.Scrollable || {};
+Elm.Scrollable.make = function (_elm) {
+   "use strict";
+   _elm.Scrollable = _elm.Scrollable || {};
+   if (_elm.Scrollable.values)
+   return _elm.Scrollable.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Scrollable",
+   $Basics = Elm.Basics.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Layout = Elm.Layout.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var style = function (xs) {
+      return A2($Html$Attributes.attribute,
+      "style",
+      $String.concat(xs));
+   };
+   _op["*="] = F2(function (attrib,
+   val) {
+      return A2($Basics._op["++"],
+      attrib,
+      A2($Basics._op["++"],
+      ": ",
+      A2($Basics._op["++"],val,";")));
+   });
+   var scrollable = F2(function (element,
+   dimensions) {
+      return function () {
+         var innerHtml = A2($Signal.map,
+         $Html.fromElement,
+         element(dimensions));
+         var innerHtmls = $Layout.join(_L.fromArray([innerHtml]));
+         var scrollableHtml = A3($Signal.map2,
+         F2(function (e,_v0) {
+            return function () {
+               switch (_v0.ctor)
+               {case "_Tuple2":
+                  return A2($Html.div,
+                    _L.fromArray([$Html$Attributes.$class("scrollable")
+                                 ,style(_L.fromArray([A2(_op["*="],
+                                                     "padding",
+                                                     "0px")
+                                                     ,A2(_op["*="],
+                                                     "margin",
+                                                     "0px")
+                                                     ,A2(_op["*="],
+                                                     "width",
+                                                     A2($Basics._op["++"],
+                                                     $Basics.toString(_v0._0),
+                                                     "px"))
+                                                     ,A2(_op["*="],
+                                                     "height",
+                                                     A2($Basics._op["++"],
+                                                     $Basics.toString(_v0._1),
+                                                     "px"))
+                                                     ,A2(_op["*="],
+                                                     "position",
+                                                     "relative")
+                                                     ,A2(_op["*="],
+                                                     "overflow",
+                                                     "auto")]))]),
+                    e);}
+               _U.badCase($moduleName,
+               "between lines 16 and 22");
+            }();
+         }),
+         innerHtmls,
+         dimensions);
+         return A3($Signal.map2,
+         F2(function (html,_v4) {
+            return function () {
+               switch (_v4.ctor)
+               {case "_Tuple2":
+                  return A3($Html.toElement,
+                    _v4._0,
+                    _v4._1,
+                    html);}
+               _U.badCase($moduleName,
+               "on line 23, column 37 to 55");
+            }();
+         }),
+         scrollableHtml,
+         dimensions);
+      }();
+   });
+   _elm.Scrollable.values = {_op: _op
+                            ,scrollable: scrollable
+                            ,style: style};
+   return _elm.Scrollable.values;
+};
