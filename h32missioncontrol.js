@@ -37,7 +37,7 @@ if (Meteor.isClient) {
 
 		missioncontrol.ports.searchQueryOut.subscribe(function (query) {
 			if (query) {
-				var music_query = { command : "search", arguments : ["title", query], result : [], waiting : true }
+				var music_query = { command : "search", arguments : ["any", query], result : [], waiting : true }
 				var query_id = music_queries.insert(music_query);
 				Session.set("query_id", query_id);
 			}
